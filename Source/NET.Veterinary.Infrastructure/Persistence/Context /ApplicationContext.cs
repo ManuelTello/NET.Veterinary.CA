@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using NET.Veterinary.Domain.AggregateRoots.Appointment;
 
 namespace NET.Veterinary.Infrastructure.Persistence.Context
 {
@@ -12,5 +13,7 @@ namespace NET.Veterinary.Infrastructure.Persistence.Context
 
             modelBuilder.ApplyConfigurationsFromAssembly(assembly);
         }
+        
+        public DbSet<Appointment> Appointments { get; set; }
     }
 }

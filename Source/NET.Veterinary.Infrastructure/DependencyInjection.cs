@@ -1,7 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using NET.Veterinary.Domain.IRepositories;
 using NET.Veterinary.Infrastructure.Persistence.Context;
+using NET.Veterinary.Infrastructure.Persistence.Repositories;
 
 namespace NET.Veterinary.Infrastructure
 {
@@ -17,10 +19,8 @@ namespace NET.Veterinary.Infrastructure
         {
             var connectionString = configuration.GetConnectionString("PostgresConnection") ?? throw new ArgumentNullException();
 
-            services.AddDbContext<ApplicationContext>(options =>
-            {
-                options.UseNpgsql(connectionString);
-            });
+            services.AddScoped<IAppointmentRepository, AppointmentRepository>();
+            services.AddDbContext<ApplicationContext>(options => options.UseNpgsql(connectionString));
 
             return services;
         }
