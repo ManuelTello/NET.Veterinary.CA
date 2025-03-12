@@ -19,4 +19,9 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\Source\NET.Veterinary.Domain\NET.Veterinary.Domain.csproj" />
+    <ProjectReference Include="..\..\Source\NET.Veterinary.Application\NET.Veterinary.Application.csproj" />
+  </ItemGroup>
+
 </Project>
