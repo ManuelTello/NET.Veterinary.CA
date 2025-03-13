@@ -1,35 +1,30 @@
 using MediatR;
-using NET.Veterinary.Domain.AggregateRoots.Appointment;
+using NET.Veterinary.Application.Helpers;
 using NET.Veterinary.Domain.IRepositories;
 using NET.Veterinary.Domain.ObjectValues;
 
 namespace NET.Veterinary.Application.Appointment.CreateAppointment
 {
-    public class CreateAppointmentCommandHandler : IRequestHandler<CreateAppointmentCommand, Unit>
+    public class CreateAppointmentCommandHandler(IAppointmentRepository repository) : IRequestHandler<CreateAppointmentCommand, Response<Unit>>
     {
-        private readonly IAppointmentRepository _repository;
+        private readonly IAppointmentRepository _repository = repository;
 
-        public CreateAppointmentCommandHandler(IAppointmentRepository repository)
+        public async Task<Response<Unit>> Handle(CreateAppointmentCommand request, CancellationToken cancellationToken)
         {
-            this._repository = repository;
-        }
-
-        public async Task<Unit> Handle(CreateAppointmentCommand request, CancellationToken cancellationToken)
-        {
-            ICollection<string> errors = new List<string>();
+            var errors = new Dictionary<string, ICollection<string>>();
 
             var completeName = CompleteName.Create(request.CompleteName);
             var dateSelected = TimestampNoTimeZone.Create(request.DateSelected);
             var identification = Identification.Create(request.Identification);
 
             if (completeName.IsFailed)
-                errors.Add(completeName.Errors.First().Message);
+                errors.Add("CompleteName", [completeName.Errors.First().Message]);
 
             if (dateSelected.IsFailed)
-                errors.Add(completeName.Errors.First().Message);
+                errors.Add("DateSelected", [dateSelected.Errors.First().Message]);
 
             if (identification.IsFailed)
-                errors.Add(identification.Errors.First().Message);
+                errors.Add("Identification", [identification.Errors.First().Message]);
 
             if (errors.Count == 0)
             {
@@ -39,12 +34,12 @@ namespace NET.Veterinary.Application.Appointment.CreateAppointment
 
                 await this._repository.CreateAppointmentAsync(appointment);
                 await this._repository.SaveChangesAsync(cancellationToken);
-                
-                return Unit.Value;
+
+                return Response<Unit>.Create(Unit.Value, errors, true);
             }
             else
             {
-                
+                return Response<Unit>.Create(Unit.Value, errors, false);
             }
         }
     }
